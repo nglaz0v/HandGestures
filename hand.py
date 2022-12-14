@@ -26,16 +26,17 @@ def fingerPosition(image, handNo=0):
             lmList.append([id, cx, cy])
     return lmList
 
-
-# For webcam input:
-cap = cv2.VideoCapture(0)
-cap.set(3, wCam)
-cap.set(4, hCam)
+use_webcam = False
+if use_webcam:
+    # For webcam input:
+    cap = cv2.VideoCapture(0)
+    cap.set(3, wCam)
+    cap.set(4, hCam)
 with mp_hands.Hands(
         min_detection_confidence=0.8,
         min_tracking_confidence=0.5) as hands:
-    while cap.isOpened():
-        success, image = cap.read()
+    while True if not use_webcam else cap.isOpened():
+        success, image = True, cv2.imread("hand.png") if not use_webcam else cap.read()
         if not success:
             print("Ignoring empty camera frame.")
             # If loading a video, use 'break' instead of 'continue'.
