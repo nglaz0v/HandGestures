@@ -1,21 +1,27 @@
 """
+Gesture Controlled Video Player using Raspberry Pi and MediaPipe - Play, Pause and Control Volume using Gestures
+
 https://microkontroller.ru/raspberry-pi-projects/upravlyaemyj-zhestami-videopleer-na-raspberry-pi-i-mediapipe/
 """
 
-import cv2
+import cv2 as cv
 import mediapipe as mp
-import pyautogui
+import pyautogui as gui
+import sys
+
+
+USE_WEBCAM = (len(sys.argv) > 1) and (sys.argv[1] == "WEBCAM")
+
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
-##################################
-tipIds = [4, 8, 12, 16, 20]
+
+tipIds = (4, 8, 12, 16, 20)
 state = None
 Gesture = None
 wCam, hCam = 720, 640
-############################
 
 
-def fingerPosition(image, handNo=0):
+def finger_position(image, handNo=0):
     lmList = []
     if results.multi_hand_landmarks:
         myHand = results.multi_hand_landmarks[handNo]
@@ -26,34 +32,34 @@ def fingerPosition(image, handNo=0):
             lmList.append([id, cx, cy])
     return lmList
 
-use_webcam = False
-if use_webcam:
+
+if USE_WEBCAM:
     # For webcam input:
-    cap = cv2.VideoCapture(0)
-    cap.set(3, wCam)
-    cap.set(4, hCam)
+    cap = cv.VideoCapture(0)
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, wCam)
+    cap.set(cv.CAP_PROP_FRAME_WIDTH, hCam)
+
 with mp_hands.Hands(
         min_detection_confidence=0.8,
         min_tracking_confidence=0.5) as hands:
-    while True if not use_webcam else cap.isOpened():
-        success, image = True, cv2.imread("hand.png") if not use_webcam else cap.read()
+    while True if not USE_WEBCAM else cap.isOpened():
+        success, image = (True, cv.imread("hand.png")) if not USE_WEBCAM else cap.read()
         if not success:
             print("Ignoring empty camera frame.")
             # If loading a video, use 'break' instead of 'continue'.
             continue
-        # Flip the image horizontally for a later selfie-view display, and convert
-        # конвертирование BGR формата в RGB
-        image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
+        # flip the image horizontally for a later selfie-view display, and convert BGR to RGB
+        image = cv.cvtColor(cv.flip(image, 1), cv.COLOR_BGR2RGB)
         image.flags.writeable = False
         results = hands.process(image)
-        # рисуем аннотацию к управлению жестами на картинке
+        # draw an annotation for gesture control in the picture
         image.flags.writeable = True
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        image = cv.cvtColor(image, cv.COLOR_RGB2BGR)
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 mp_drawing.draw_landmarks(
                     image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-        lmList = fingerPosition(image)
+        lmList = finger_position(image)
         # print(lmList)
         if len(lmList) != 0:
             fingers = []
@@ -63,7 +69,7 @@ with mp_hands.Hands(
                     fingers.append(1)
                 if (lmList[tipIds[id]][2] > lmList[tipIds[id] - 2][2]):
                     # state = "Pause"
-                    # pyautogui.press('space')
+                    # gui.press('space')
                     # print("Space")
                     fingers.append(0)
             totalFingers = fingers.count(1)
@@ -75,27 +81,28 @@ with mp_hands.Hands(
                 # fingers.append(1)
             if totalFingers == 0 and state == "Play":
                 state = "Pause"
-                pyautogui.press('space')
+                gui.press('space')
                 print("Space")
             if totalFingers == 1:
                 if lmList[8][1] < 300:
                     print("left")
-                    pyautogui.press('left')
+                    gui.press('left')
                 if lmList[8][1] > 400:
                     print("Right")
-                    pyautogui.press('Right')
+                    gui.press('Right')
             if totalFingers == 2:
                 if lmList[9][2] < 210:
                     print("Up")
-                    pyautogui.press('Up')
+                    gui.press('Up')
                 if lmList[9][2] > 230:
                     print("Down")
-                    pyautogui.press('Down')
-        # cv2.putText(image, str("Gesture"), (10,40), cv2.FONT_HERSHEY_SIMPLEX,
-        #             1, (255, 0, 0), 2)
-        cv2.imshow("Media Controller", image)
-        key = cv2.waitKey(1) & 0xFF
-        # если нажата клавиша `q`, то осуществляем выход из цикла
-        if key == ord("q"):
+                    gui.press('Down')
+        # cv.putText(image, str("Gesture"), (10, 40), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        cv.imshow("Media Controller", image)
+        key = cv.waitKey(1) & 0xFF
+        if key == 27:
             break
-    cv2.destroyAllWindows()
+
+    if USE_WEBCAM:
+        cap.release()
+    cv.destroyAllWindows()
