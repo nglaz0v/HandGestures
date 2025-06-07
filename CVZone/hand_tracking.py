@@ -1,4 +1,6 @@
 """
+CVZone - Hand Tracking Module
+
 https://github.com/cvzone/cvzone?tab=readme-ov-file#hand-tracking-module
 """
 

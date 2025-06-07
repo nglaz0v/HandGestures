@@ -1,7 +1,7 @@
 """
 Gesture Controlled Video Player using Raspberry Pi and MediaPipe - Play, Pause and Control Volume using Gestures
 
-https://microkontroller.ru/raspberry-pi-projects/upravlyaemyj-zhestami-videopleer-na-raspberry-pi-i-mediapipe/
+https://circuitdigest.com/microcontroller-projects/gesture-controlled-media-player-using-raspberry-pi-and-mediapipe
 """
 
 import cv2 as cv

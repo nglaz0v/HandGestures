@@ -1,5 +1,6 @@
 opencv-python
-mediapipe
-PyAutoGUI
 numpy
 matplotlib
+PyAutoGUI
+mediapipe
+cvzone
