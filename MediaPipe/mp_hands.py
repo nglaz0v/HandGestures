@@ -1,5 +1,5 @@
 """
-https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/hands.md
+https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/hands.md#python-solution-api
 """
 
 import cv2
